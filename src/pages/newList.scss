@@ -1,10 +1,5 @@
 @charset "utf-8";
 
-.new-list {
-  width: 1000px;
-  margin: 0 auto;
-}
-
 .new-list-form {
   color: #555555;
 }
@@ -12,6 +7,10 @@
 .new-list-title {
   width: 300px;
   margin-bottom: 25px;
+
+  @media (max-width: 768px) {
+    width: 100%; /* タイトルの幅をフルにする */
+  }
 }
 
 .new-list-button {

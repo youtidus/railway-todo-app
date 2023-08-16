@@ -3,7 +3,15 @@
 .signup {
   width: 500px;
   margin: 0 auto;
+
+  /* スクリーン幅が 768px 以下の場合に適用されるスタイル */
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+  }
 }
+
 .signup-form {
   margin: 25px 0;
   color: #555555;
@@ -24,6 +32,10 @@
   width: 100px;
   height: 40px;
   border-radius: 5px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .error-message {

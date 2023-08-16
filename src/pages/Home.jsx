@@ -46,6 +46,10 @@ export const Home = () => {
           setErrorMessage(`タスクの取得に失敗しました。${err}`);
         });
     }
+
+    if (lists.length > 0) {
+      document.querySelector('.list-tab-item').focus();
+    }
   }, [lists]);
 
   const handleSelectList = (id) => {
@@ -63,12 +67,29 @@ export const Home = () => {
         setErrorMessage(`タスクの取得に失敗しました。${err}`);
       });
   };
+
+  const handleKeyDown = (e, index) => {
+    let nextIndex = index;
+
+    if (e.key === 'ArrowRight') {
+      nextIndex = (index + 1) % lists.length;
+    } else if (e.key === 'ArrowLeft') {
+      nextIndex = (index - 1 + lists.length) % lists.length;
+    }
+
+    // 配列の範囲内にあるか確認する
+    if (nextIndex >= 0 && nextIndex < lists.length && lists[nextIndex]) {
+      handleSelectList(lists[nextIndex].id);
+      e.currentTarget.parentNode.children[nextIndex].focus();
+    }
+  };
+  
   return (
     <div>
       <Header />
       <main className="taskList">
         <p className="error-message">{errorMessage}</p>
-        <div>
+        <div className="content-wrapper">
           <div className="list-header">
             <h2>リスト一覧</h2>
             <div className="list-menu">
@@ -88,8 +109,12 @@ export const Home = () => {
               return (
                 <li
                   key={key}
+                  tabIndex="0"
                   className={`list-tab-item ${isActive ? 'active' : ''}`}
+                  role="tab"
+                  aria-selected={isActive}
                   onClick={() => handleSelectList(list.id)}
+                  onKeyDown={(e) => handleKeyDown(e, key)}
                 >
                   {list.title}
                 </li>
@@ -150,6 +175,38 @@ const Tasks = (props) => {
     );
   }
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    let hour = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const amPm = hour < 12 ? '午前' : '午後';
+
+    // 午後の場合、12時間形式に変換
+    if (hour > 12) {
+      hour -= 12;
+    }
+
+    return `${year}年${month}月${day}日 ${amPm} ${hour}:${minutes}`;
+  };
+
+  const getRemainingTime = (deadline) => {
+    const deadlineDate = new Date(deadline);
+    const currentDate = new Date();
+    const diff = deadlineDate - currentDate;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${days}日 ${hours}時間 ${minutes}分`;
+  };
+
+  // Date関数にgetHours等があるのでそういったものを活用する。
+  // 時間が空いてからコード見てもすぐわかるように意識して書く
+
   return (
     <ul>
       {tasks
@@ -162,9 +219,12 @@ const Tasks = (props) => {
               to={`/lists/${selectListId}/tasks/${task.id}`}
               className="task-item-link"
             >
-              {task.title}
+              {task.title}：{task.done ? '完了' : '未完了'}
               <br />
-              {task.done ? '完了' : '未完了'}
+              期限：{task.limit ? formatDate(task.limit) : 'なし'}
+              <br />
+              残り時間：{task.limit ? getRemainingTime(task.limit) : 'なし'}
+              <br />
             </Link>
           </li>
         ))}

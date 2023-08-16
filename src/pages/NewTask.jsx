@@ -10,16 +10,19 @@ export const NewTask = () => {
   const [selectListId, setSelectListId] = useState();
   const [lists, setLists] = useState([]);
   const [title, setTitle] = useState('');
+  const [limit, setLimit] = useState('');
   const [detail, setDetail] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [cookies] = useCookies();
   const navigate = useNavigate();
   const handleTitleChange = (e) => setTitle(e.target.value);
+  const handleLimitChange = (e) => setLimit(e.target.value);
   const handleDetailChange = (e) => setDetail(e.target.value);
   const handleSelectList = (id) => setSelectListId(id);
   const onCreateTask = () => {
     const data = {
       title: title,
+      limit: limit ? `${limit}:00Z` : null,
       detail: detail,
       done: false,
     };
@@ -65,7 +68,7 @@ export const NewTask = () => {
           <br />
           <select
             onChange={(e) => handleSelectList(e.target.value)}
-            className="new-task-select-list"
+            className="form-item new-task-select-list"
           >
             {lists.map((list, key) => (
               <option key={key} className="list-item" value={list.id}>
@@ -79,7 +82,15 @@ export const NewTask = () => {
           <input
             type="text"
             onChange={handleTitleChange}
-            className="new-task-title"
+            className="form-item new-task-title"
+          />
+          <br />
+          <label>期限日時</label>
+          <br />
+          <input
+            type="datetime-local"
+            onChange={handleLimitChange}
+            className="form-item new-task-limit"
           />
           <br />
           <label>詳細</label>
@@ -87,12 +98,12 @@ export const NewTask = () => {
           <textarea
             type="text"
             onChange={handleDetailChange}
-            className="new-task-detail"
+            className="form-item new-task-detail"
           />
           <br />
           <button
             type="button"
-            className="new-task-button"
+            className="form-item new-task-button"
             onClick={onCreateTask}
           >
             作成
